@@ -1,2 +1,2 @@
-# ib1
+# IB1
 Instrumentação Biomédica 1
