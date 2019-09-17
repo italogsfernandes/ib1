@@ -13,19 +13,20 @@ import sys
 if sys.version_info.major == 3:
     # PyQt5
     from PyQt5.QtWidgets import *
-    from views import base_qt5 as base
+    from PyQt5.uic import loadUiType
     from PyQt5 import QtCore
 elif sys.version_info.major == 2:
     # PyQt4
     from PyQt4.QtGui import *
-    from views import base_qt4 as base
+    from PyQt4.uic import loadUiType
     from PyQt4 import QtCore
 else:
-    print("Versao do python nao suportada")
+    print("Versao do python não suportada")
 # ------------------------------------------------------------------------------
 
+Ui_MainWindow, QMainWindow = loadUiType('views/layouts/base.ui')
 
-class IB1AppForm(QMainWindow, base.Ui_MainWindow):
+class IB1AppForm(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(self.__class__, self).__init__(parent)
         self.setupUi(self)
