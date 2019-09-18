@@ -15,3 +15,9 @@ Instrumentação Biomédica 1
 ## Rodando
 * Abra um terminal na pasta *dacq_app*.
 * Execute o arquivo **app.py**: `python app.py`
+
+## Autores
+* Italo
+* Bruna
+* Filipe
+* Ana
