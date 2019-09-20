@@ -1,5 +1,6 @@
 # IB1
 Instrumentação Biomédica 1
+[Cronograma](https://docs.google.com/spreadsheets/d/1-90X5oCXaSawRg9z0GiOyt68x7-coC0qeFPKeV69EhE/edit#gid=0)
 
 ## Organização dos Arquivos
 * **dacq_app**: Software de acquisição.
