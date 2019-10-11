@@ -1,3 +1,54 @@
+# STM32
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Misc
+*.map
+*.m
+*.png
+
+# Eclipse CDT project files
+STM32/Alcimar1/.cproject
+STM32/Alcimar1/.project
+STM32/Alcimar1/.settings/
+
+# Vagrant directory
+STM32/Alcimar1/.vagrant/
+
+# Include makefiles
+!Makefile
+*~
+
+# Libraries
+STM32/Alcimar1/lib
+
+########################
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
