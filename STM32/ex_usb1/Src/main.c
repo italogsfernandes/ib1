@@ -195,61 +195,8 @@ int main(void)
 	  usbv[2] = adcValue & 0xFF; //LSB: AND operation with 255 00000000 11111111
 	  CDC_Transmit_FS(usbv, 4);
 
-//	  //3) convert from potentiometer to pwm duty cycle
-//	  uint16_t newPWMv = 0;
-//	  if(adcValue < 2048)
-//		  newPWMv = 100;
-//	  else
-//		  newPWMv = 9000;
-//
-//	  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1); //stops the pwm
-//
-//	  TIM_OC_InitTypeDef sConfigOC = {0};
-//	  sConfigOC.OCMode = TIM_OCMODE_PWM1;
-//	  sConfigOC.Pulse = newPWMv;
-//	  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-//	  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-//
-//
-//	  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-//	  {
-//	    _Error_Handler(__FILE__, __LINE__);
-//	  }
-//
-//	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-//
-//	  //4) wait for some time
-//	  HAL_Delay(100);
-
-	  //3) control PWM with the value of the potentiometer
-	  //PULSE define duty
-	  //freq (Hz) = MASTER CLK / [(PSC + 1) * (COUNT + 1)]
-	  //SE MCLK = 72MHz
-	  //Freq = 1kHz
-	  //PSC = 71
-	  //COUNT = 9999
-
-
 	  //4) wait for some time
-	  HAL_Delay(100);
-
-
-	  //usb -> send 1 just byte p/ time
-
-
-	  //PARTE 1
-	  //one value will be sent via USB
-	  //the variable has to be an array of N positions, where
-	  //N is less than the size of the USB buffer
-//	  uint8_t usbSendVar[4] = {0x42, 0x43, 0x44, 0x45};
-
-	  //the transmit function takes two arguments
-	  //1st: the array containing data to be sent
-	  //2sd:how many bytes should be transferred
-//	  CDC_Transmit_FS(usbSendVar, 4); //transferindo do dispositivo pro pc em fullspeed option
-
-	  //wait for 100ms
-//	  HAL_Delay(100);
+	  HAL_Delay(10);
   }
   /* USER CODE END 3 */
 
