@@ -162,11 +162,11 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         if self.process_in_plotter:
             if self.arduinoHandler.data_waiting:
                 #print("help! i need")
-                self.emg_value = self.arduinoHandler.buffer_acquisition.get() * 5.0 / 1024.0 - 2.5
+                self.emg_value = self.arduinoHandler.buffer_acquisition.get() * 5.0 / 4096.0 - 2.5
                 self.plotHandler.emg_bruto.buffer.put(self.emg_value)
         elif self.process_simple_way:
             if self.arduinoHandler.data_waiting:
-                self.emg_value = self.arduinoHandler.buffer_acquisition.get() * 5.0 / 1024.0 - 2.5
+                self.emg_value = self.arduinoHandler.buffer_acquisition.get() * 5.0 / 4096.0 - 2.5
                 #self.offset_values = np.roll(self.offset_values, -1)
                 #self.offset_values[:-1] = self.offset_values[1:]
                 #self.offset_values[-1] = self.emg_value
@@ -189,7 +189,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
                 # print "hello i'm here"
                 points_to_process = self.arduinoHandler.buffer_acquisition.qsize()
                 for n in range(points_to_process):
-                    self.emg_value = self.arduinoHandler.buffer_acquisition.get()*5.0/1024.0 - 2.5
+                    self.emg_value = self.arduinoHandler.buffer_acquisition.get()*5.0/ 4096.0 - 2.5
                     self.process.buffer.append(self.emg_value)
                 self.process.update_values()
                 self.process.do_process()
@@ -201,7 +201,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
                     self.plotHandler.envoltoria.buffer.put(self.process.envoltoria[index_out])
         else:
             if self.arduinoHandler.data_waiting:
-                self.emg_value = self.arduinoHandler.buffer_acquisition.get() * 5.0 / 1024.0 - 2.5
+                self.emg_value = self.arduinoHandler.buffer_acquisition.get() * 5.0 / 4096.0 - 2.5
                 self.plotHandler.emg_bruto.buffer.put(self.emg_value)
 
 
