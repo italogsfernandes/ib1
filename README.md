@@ -11,7 +11,7 @@ Instrumentação Biomédica 1
 * Crie um ambiente virtual: `virtualenv env`
 * Ative o ambiente virual: `source env/bin/activate`
 * Instale as bibliotecas requeridas: `pip install -r requirements.txt`
-* Caso altere a lista de bibliotecas utilize `c` para atualizar o arquivo.
+* Caso altere a lista de bibliotecas utilize `pip frezze >  requiremente.txt` para atualizar o arquivo.
 
 ## Rodando
 * Abra um terminal na pasta *dacq_app*.
