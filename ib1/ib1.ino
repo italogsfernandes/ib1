@@ -25,8 +25,8 @@
 //Uncomment the next line to activate the sending of data as text
 //This is usefull when you are using the serial plotter tool (Ctrl+shift+L)
 
-//#define ADC_ACQUIRER
-#define AVR_ACQUIRER
+#define ADC_ACQUIRER
+//#define AVR_ACQUIRER
 //#define SIMULATOR
 //#define PLOTTER_SERIAL
 
@@ -130,7 +130,7 @@ void setup() {
   Serial.begin(UART_BAUDRATE);
 
   pinMode(PINO_FONE, OUTPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
+//  pinMode(LED_BUILTIN, OUTPUT);
   pinMode(PINO_TRIGGER_IN, INPUT_PULLUP);
 
   #ifdef SIMULATOR
@@ -153,12 +153,12 @@ void loop() {
     alarm_time = time_now + 500; // proximo alarme daqui a 500ms
 
     // seleciona estimulo
-    randNumber = random(10);
+    randNumber = random(5);
     freq_next = (randNumber == 0) ? FREQ_ODD : FREQ_BASE; // random
     freq_next = (freq_now == FREQ_ODD) ? FREQ_BASE : freq_next; // dont repeat
 
     // Go signal go
-    digitalWrite(LED_BUILTIN, freq_now == FREQ_ODD);
+//    digitalWrite(LED_BUILTIN, freq_now == FREQ_ODD);
     trigger_value = (freq_next == FREQ_ODD) ? 1: 0;
     trigger_value = (freq_now == FREQ_ODD) ? 2: trigger_value;
     tone(PINO_FONE, freq_now, 200);
