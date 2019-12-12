@@ -107,7 +107,9 @@ unsigned long time_now, alarm_time;
 #define ADC_CS_PINO 10
 #define ADC_BUSY_PINO 9
 
-#define ADC_CONVERSION_REGISTER 0x84 //0b 1000 0100
+//#define ADC_CONVERSION_REGISTER 0x84 //0b 1000 0100
+#define ADC_CONVERSION_REGISTER 0xD6 //0b 1101 0110 (CH3 - Internal clock)
+//#define ADC_CONVERSION_REGISTER 0x86 //0b 1000 0110 (CH0 - Internal clock)
 
 SPISettings adc_spi_settings(8000000, MSBFIRST, SPI_MODE0);
 
@@ -213,11 +215,12 @@ uint16_t read_adc() {
   digitalWrite(ADC_CS_PINO, LOW);
   SPI.beginTransaction(adc_spi_settings);
   SPI.transfer(ADC_CONVERSION_REGISTER);
-  digitalWrite(ADC_CS_PINO, HIGH);
+  //digitalWrite(ADC_CS_PINO, HIGH);
 
-  delayMicroseconds(2);
+  delayMicroseconds(8);
+  //while(!digitalRead(ADC_BUSY_PINO));
 
-  digitalWrite(ADC_CS_PINO, LOW);
+  //digitalWrite(ADC_CS_PINO, LOW);
   adc_reading_msb = SPI.transfer(0);
   adc_reading_lsb = SPI.transfer(0);
   SPI.transfer(0);
