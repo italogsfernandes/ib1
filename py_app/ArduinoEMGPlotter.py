@@ -177,11 +177,15 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
                     if len(self.sinal_antes_do_estimulo) >= 100:  # 500ms
                         self.sinais_antes_do_estimulo.append(
                             self.sinal_antes_do_estimulo.copy())
+                        if len(self.sinais_antes_do_estimulo) > 10:
+                            self.sinais_antes_do_estimulo.pop(0)
                         self.sinal_antes_do_estimulo = []
                 elif buf_data[1] == 0:  # Reseta vetor com estimulo
                     if len(self.sinal_durante_estimulo) >= 100:  # 500ms
                         self.sinais_com_estimulo.append(
                             self.sinal_durante_estimulo.copy())
+                        if len(self.sinais_com_estimulo) > 10:
+                            self.sinais_com_estimulo.pop(0)
                         self.sinal_durante_estimulo = []
                 self.plotHandler.emg_bruto.buffer.put(self.emg_value)
         elif self.process_simple_way:
@@ -231,11 +235,15 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
                     if len(self.sinal_antes_do_estimulo) >= 100:  # 500ms
                         self.sinais_antes_do_estimulo.append(
                             self.sinal_antes_do_estimulo.copy())
+                        if len(self.sinais_antes_do_estimulo) > 10:
+                            self.sinais_antes_do_estimulo.pop(0)
                         self.sinal_antes_do_estimulo = []
                 elif buf_data[1] == 0:  # Reseta vetor com estimulo
                     if len(self.sinal_durante_estimulo) >= 100:  # 500ms
                         self.sinais_com_estimulo.append(
                             self.sinal_durante_estimulo.copy())
+                        if len(self.sinais_com_estimulo) > 10:
+                            self.sinais_com_estimulo.pop(0)
                         self.sinal_durante_estimulo = []
                 self.plotHandler.emg_bruto.buffer.put(self.emg_value)
 
