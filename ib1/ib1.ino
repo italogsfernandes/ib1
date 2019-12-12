@@ -25,9 +25,9 @@
 //Uncomment the next line to activate the sending of data as text
 //This is usefull when you are using the serial plotter tool (Ctrl+shift+L)
 
-#define ADC_ACQUIRER
+//#define ADC_ACQUIRER
 //#define AVR_ACQUIRER
-//#define SIMULATOR
+#define SIMULATOR
 #define PLOTTER_SERIAL
 
 
@@ -134,8 +134,8 @@ void setup() {
   pinMode(PINO_TRIGGER_IN, INPUT_PULLUP);
 
   #ifdef SIMULATOR
-  my_generator.setOffset(0);
-  my_generator.setAmplitude(1);
+  my_generator.setOffset(32768);
+  my_generator.setAmplitude(3276);
   my_generator.setWaveform(EEG_BASE_WAVE);
   #endif
 
