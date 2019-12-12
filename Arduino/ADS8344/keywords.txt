@@ -1,0 +1,4 @@
+
+ADS8344	KEYWORD1
+adc_init KEYWORD2
+adc_read KEYWORD2
