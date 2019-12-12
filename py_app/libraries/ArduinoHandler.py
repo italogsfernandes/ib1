@@ -66,8 +66,8 @@ class ArduinoHandler:
     --------
     See the code of the test function in this file for two command line examples.
     """
-    def __init__(self, port_name=None, baudrate=115200, qnt_ch=1):
-        self.qnt_ch = qnt_ch
+    def __init__(self, port_name=None, baudrate=115200, qnt_ch=2):
+        self.qnt_ch = 2
         if port_name is None:
             port_name = ArduinoHandler.get_arduino_serial_port()
         self.serial_tools_obj = [s for s in serial_tools.comports() if s.device == port_name][0]

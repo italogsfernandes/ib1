@@ -96,7 +96,7 @@ class EMGProcessing:
 
 
 class ArduinoEMGPlotter(QtArduinoPlotter):
-    def __init__(self, parent, app=None, label=None):
+    def __init__(self, parent, app=None, label=None, edited_image_fig=None, line=None, canvas=None):
         QtArduinoPlotter.__init__(self, parent, app, label)
         self.process = EMGProcessing()
         self.plotHandler.emg_bruto.set_visible(True)
@@ -116,6 +116,16 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
 
         self.process_in_thread = False
 
+        self.sinal_antes_do_estimulo = []
+        self.sinal_durante_estimulo = []
+        self.sinais_antes_do_estimulo = []
+        self.sinais_com_estimulo = []
+        self.edited_image_fig = edited_image_fig
+        self.line = line
+        self.resultado = [0] * 90
+        self.canvas = canvas
+        # self.update_matplotlib_chart()
+
     def get_buffers_status(self, separator):
         """
         Returns a string like:
@@ -130,7 +140,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         """
         Only initializes the plotHandler object. It is set as a method to allow override.
         """
-        self.plotHandler = EMGPlotHandler(qnt_points=4096, parent=parent, y_range=(-2.5, 2.5),
+        self.plotHandler = EMGPlotHandler(qnt_points=5000, parent=parent, y_range=(-2.5, 2.5),
                                           app=app, proc=None)
         self.plotHandler.process_in_plotter = False
         self.plotHandler.proc = 'hbt+btr'
@@ -162,7 +172,26 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         if self.process_in_plotter:
             if self.arduinoHandler.data_waiting:
                 #print("help! i need")
-                self.emg_value = self.arduinoHandler.buffer_acquisition.get() * 5.0 / 4096.0 - 2.5
+                buf_data = self.arduinoHandler.buffer_acquisition.get()
+                self.emg_value = buf_data[0] * 5.0 / 65536.0 - 2.5
+
+                if buf_data[1] == 1:  # Add points to vetor antes do estimulo
+                    self.sinal_antes_do_estimulo.append(self.emg_value)
+                elif buf_data[1] == 2:  # Reseta vetor antes do estimulo
+                    self.sinal_durante_estimulo.append(self.emg_value)
+                    if len(self.sinal_antes_do_estimulo) >= 100:  # 500ms
+                        self.sinais_antes_do_estimulo.append(
+                            self.sinal_antes_do_estimulo.copy())
+                        if len(self.sinais_antes_do_estimulo) > 10:
+                            self.sinais_antes_do_estimulo.pop(0)
+                        self.sinal_antes_do_estimulo = []
+                elif buf_data[1] == 0:  # Reseta vetor com estimulo
+                    if len(self.sinal_durante_estimulo) >= 100:  # 500ms
+                        self.sinais_com_estimulo.append(
+                            self.sinal_durante_estimulo.copy())
+                        if len(self.sinais_com_estimulo) >= 10:
+                            self.sinais_com_estimulo.pop(0)
+                        self.sinal_durante_estimulo = []
                 self.plotHandler.emg_bruto.buffer.put(self.emg_value)
         elif self.process_simple_way:
             if self.arduinoHandler.data_waiting:
@@ -201,8 +230,63 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
                     self.plotHandler.envoltoria.buffer.put(self.process.envoltoria[index_out])
         else:
             if self.arduinoHandler.data_waiting:
-                self.emg_value = self.arduinoHandler.buffer_acquisition.get() * 5.0 / 4096.0 - 2.5
+                buf_data = self.arduinoHandler.buffer_acquisition.get()
+                self.emg_value = buf_data[0] * (5.0 / 65536.0)
+
+                if buf_data[1] == 1:  # Add points to vetor antes do estimulo
+                    self.sinal_antes_do_estimulo.append(self.emg_value)
+                elif buf_data[1] == 2:  # Reseta vetor antes do estimulo
+                    self.sinal_durante_estimulo.append(self.emg_value)
+                    if len(self.sinal_antes_do_estimulo) >= 95:  # 500ms
+                        self.sinais_antes_do_estimulo.append(
+                            self.sinal_antes_do_estimulo)
+                        if len(self.sinais_antes_do_estimulo) > 10:
+                            self.sinais_antes_do_estimulo.pop(0)
+                        self.sinal_antes_do_estimulo = []
+                elif buf_data[1] == 0:  # Reseta vetor com estimulo
+                    if len(self.sinal_durante_estimulo) >= 95:  # 500ms
+                        self.sinais_com_estimulo.append(
+                            self.sinal_durante_estimulo)
+                        # print(len(self.sinais_com_estimulo))
+                        if len(self.sinais_com_estimulo) > 10:
+                            self.sinais_com_estimulo.pop(0)
+                        # try:
+                        self.update_matplotlib_chart()
+                        # except Exception as e:
+                            # print(e)
+                        self.sinal_durante_estimulo = []
                 self.plotHandler.emg_bruto.buffer.put(self.emg_value)
+
+    def update_matplotlib_chart(self):
+        qnt_mean1 = len(self.sinais_antes_do_estimulo)
+        qnt_mean2 = len(self.sinais_com_estimulo)
+        qnt_mean = min((qnt_mean1, qnt_mean2))
+        if qnt_mean < 2:
+            return
+        np_antes = np.zeros((qnt_mean, 90))
+        np_estimulo = np.zeros((qnt_mean, 90))
+        for i in range(qnt_mean):
+            np_antes[i, :] = self.sinais_antes_do_estimulo[i][:90]
+            np_estimulo[i, :] = self.sinais_com_estimulo[i][:90]
+        subtracao = np_estimulo - np_antes
+        resultado = np.mean(subtracao, 0)
+        self.resultado = resultado
+        # print(resultado)
+        self.line.set_data(
+            np.arange(0, len(self.resultado)),
+            self.resultado
+        )
+        self.canvas.draw()
+        # import matplotlib.pyplot as plt
+        # plt.plot(resultado)
+        # plt.show()
+        # self.line.set_data(np.arrange(0, 90), resultado)
+        # gca_example = self.edited_image_fig.gca()
+        # gca_example.plot(resultado.tolist())
+        # gca_example.set_title("MMN")
+        # gca_example.grid(True)
+        # gca_example.set_xlabel('Index')
+        # gca_example.set_ylabel('Media do sinal')
 
 
 def test():

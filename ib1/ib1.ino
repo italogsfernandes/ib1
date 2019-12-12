@@ -28,7 +28,7 @@
 #define ADC_ACQUIRER
 //#define AVR_ACQUIRER
 //#define SIMULATOR
-#define PLOTTER_SERIAL
+//#define PLOTTER_SERIAL
 
 
 //Libraries
@@ -118,6 +118,8 @@ uint8_t adc_reading_msb, adc_reading_lsb;
 //////////////////
 //Main Function //
 //////////////////
+uint8_t trigger_value = 0;
+
 void setup() {
 #ifdef ADC_ACQUIRER
   SPI.begin();
@@ -128,12 +130,12 @@ void setup() {
   Serial.begin(UART_BAUDRATE);
 
   pinMode(PINO_FONE, OUTPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
+//  pinMode(LED_BUILTIN, OUTPUT);
   pinMode(PINO_TRIGGER_IN, INPUT_PULLUP);
 
   #ifdef SIMULATOR
-  my_generator.setOffset(0);
-  my_generator.setAmplitude(1);
+  my_generator.setOffset(32768);
+  my_generator.setAmplitude(3276);
   my_generator.setWaveform(EEG_BASE_WAVE);
   #endif
 
@@ -151,12 +153,14 @@ void loop() {
     alarm_time = time_now + 500; // proximo alarme daqui a 500ms
 
     // seleciona estimulo
-    randNumber = random(10);
+    randNumber = random(5);
     freq_next = (randNumber == 0) ? FREQ_ODD : FREQ_BASE; // random
     freq_next = (freq_now == FREQ_ODD) ? FREQ_BASE : freq_next; // dont repeat
 
     // Go signal go
-    digitalWrite(LED_BUILTIN, freq_now == FREQ_ODD);
+//    digitalWrite(LED_BUILTIN, freq_now == FREQ_ODD);
+    trigger_value = (freq_next == FREQ_ODD) ? 1: 0;
+    trigger_value = (freq_now == FREQ_ODD) ? 2: trigger_value;
     tone(PINO_FONE, freq_now, 200);
     freq_now = freq_next;
   }
@@ -178,7 +182,7 @@ void timerDataAcq() {
 #endif
 
 #ifdef AVR_ACQUIRER
-  adc_read_values[0] = analogRead(A0);
+  adc_read_values[0] = analogRead(A0) * 32;
 #endif
 
   //Sending the value
@@ -195,6 +199,9 @@ void sendData() {
     Serial.write(adc_read_values[i] >> 8);
     Serial.write(adc_read_values[i]);
   }
+  // Trigger
+  Serial.write(0); //msb
+  Serial.write(trigger_value); //lsb_byte
   Serial.write(PACKET_END);
 }
 
@@ -203,6 +210,7 @@ void showData() {
     Serial.print(adc_read_values[i] + 1024 * i);
     Serial.print("\t");
   }
+  Serial.print(trigger_value);
   Serial.println();
 }
 
@@ -223,10 +231,10 @@ uint16_t read_adc() {
   //digitalWrite(ADC_CS_PINO, LOW);
   adc_reading_msb = SPI.transfer(0);
   adc_reading_lsb = SPI.transfer(0);
-  SPI.transfer(0);
+  uint8_t idle_reading = SPI.transfer(0);
   digitalWrite(ADC_CS_PINO, HIGH);
   SPI.endTransaction();
 
-  return (adc_reading_msb << 8 | adc_reading_lsb);
+  return (adc_reading_msb << 9 | adc_reading_lsb << 1 | (idle_reading >> 7));
 }
 #endif
