@@ -118,6 +118,8 @@ uint8_t adc_reading_msb, adc_reading_lsb;
 //////////////////
 //Main Function //
 //////////////////
+uint8_t trigger_value = 0;
+
 void setup() {
 #ifdef ADC_ACQUIRER
   SPI.begin();
@@ -157,6 +159,8 @@ void loop() {
 
     // Go signal go
     digitalWrite(LED_BUILTIN, freq_now == FREQ_ODD);
+    trigger_value = (freq_next == FREQ_ODD) ? 1: 0;
+    trigger_value = (freq_now == FREQ_ODD) ? 2: trigger_value;
     tone(PINO_FONE, freq_now, 200);
     freq_now = freq_next;
   }
@@ -195,6 +199,9 @@ void sendData() {
     Serial.write(adc_read_values[i] >> 8);
     Serial.write(adc_read_values[i]);
   }
+  // Trigger
+  Serial.write(0); //msb
+  Serial.write(trigger_value); //lsb_byte
   Serial.write(PACKET_END);
 }
 
@@ -203,6 +210,7 @@ void showData() {
     Serial.print(adc_read_values[i] + 1024 * i);
     Serial.print("\t");
   }
+  Serial.print(trigger_value);
   Serial.println();
 }
 
