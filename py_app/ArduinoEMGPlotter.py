@@ -116,6 +116,11 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
 
         self.process_in_thread = False
 
+        self.sinal_antes_do_estimulo = []
+        self.sinal_durante_estimulo = []
+        self.sinais_antes_do_estimulo = []
+        self.sinais_com_estimulo = []
+
     def get_buffers_status(self, separator):
         """
         Returns a string like:
@@ -162,7 +167,22 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         if self.process_in_plotter:
             if self.arduinoHandler.data_waiting:
                 #print("help! i need")
-                self.emg_value = self.arduinoHandler.buffer_acquisition.get() * 5.0 / 4096.0 - 2.5
+                buf_data = self.arduinoHandler.buffer_acquisition.get()
+                self.emg_value = buf_data[0] * 5.0 / 4096.0 - 2.5
+
+                if buf_data[1] == 1:  # Add points to vetor antes do estimulo
+                    self.sinal_antes_do_estimulo.append(self.emg_value)
+                elif buf_data[1] == 2:  # Reseta vetor antes do estimulo
+                    self.sinal_durante_estimulo.append(self.emg_value)
+                    if len(self.sinal_antes_do_estimulo) >= 100:  # 500ms
+                        self.sinais_antes_do_estimulo.append(
+                            self.sinal_antes_do_estimulo.copy())
+                        self.sinal_antes_do_estimulo = []
+                elif buf_data[1] == 0:  # Reseta vetor com estimulo
+                    if len(self.sinal_durante_estimulo) >= 100:  # 500ms
+                        self.sinais_com_estimulo.append(
+                            self.sinal_durante_estimulo.copy())
+                        self.sinal_durante_estimulo = []
                 self.plotHandler.emg_bruto.buffer.put(self.emg_value)
         elif self.process_simple_way:
             if self.arduinoHandler.data_waiting:
@@ -201,7 +221,22 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
                     self.plotHandler.envoltoria.buffer.put(self.process.envoltoria[index_out])
         else:
             if self.arduinoHandler.data_waiting:
-                self.emg_value = self.arduinoHandler.buffer_acquisition.get() * 5.0 / 4096.0 - 2.5
+                buf_data = self.arduinoHandler.buffer_acquisition.get()
+                self.emg_value = buf_data[0] * 5.0 / 4096.0 - 2.5
+
+                if buf_data[1] == 1:  # Add points to vetor antes do estimulo
+                    self.sinal_antes_do_estimulo.append(self.emg_value)
+                elif buf_data[1] == 2:  # Reseta vetor antes do estimulo
+                    self.sinal_durante_estimulo.append(self.emg_value)
+                    if len(self.sinal_antes_do_estimulo) >= 100:  # 500ms
+                        self.sinais_antes_do_estimulo.append(
+                            self.sinal_antes_do_estimulo.copy())
+                        self.sinal_antes_do_estimulo = []
+                elif buf_data[1] == 0:  # Reseta vetor com estimulo
+                    if len(self.sinal_durante_estimulo) >= 100:  # 500ms
+                        self.sinais_com_estimulo.append(
+                            self.sinal_durante_estimulo.copy())
+                        self.sinal_durante_estimulo = []
                 self.plotHandler.emg_bruto.buffer.put(self.emg_value)
 
 
