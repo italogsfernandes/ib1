@@ -26,9 +26,9 @@
 //This is usefull when you are using the serial plotter tool (Ctrl+shift+L)
 
 //#define ADC_ACQUIRER
-//#define AVR_ACQUIRER
-#define SIMULATOR
-#define PLOTTER_SERIAL
+#define AVR_ACQUIRER
+//#define SIMULATOR
+//#define PLOTTER_SERIAL
 
 
 //Libraries
@@ -182,7 +182,7 @@ void timerDataAcq() {
 #endif
 
 #ifdef AVR_ACQUIRER
-  adc_read_values[0] = analogRead(A0);
+  adc_read_values[0] = analogRead(A0) * 32;
 #endif
 
   //Sending the value

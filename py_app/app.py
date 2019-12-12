@@ -105,6 +105,17 @@ class ContractionDetector(QMainWindow, base.Ui_MainWindow):
         gca_example.set_xlabel('Index')
         gca_example.set_ylabel('Media do sinal')
 
+    def update_matplotlib_chart(self, y_data=None):
+        if y_data is None:
+            time_example = np.linspace(0, 1, 100)
+            y_data = np.sin(2 * np.pi * 3 * time_example)
+        gca_example = self.edited_image_fig.gca()
+        gca_example.plot(y_data)
+        gca_example.set_title("MMN")
+        gca_example.grid()
+        gca_example.set_xlabel('Index')
+        gca_example.set_ylabel('Media do sinal')
+
     def setup_signals_connections(self):
         #self.actionProcessamento.triggered.connect(self.processamento_clicked)
         self.btn_start.clicked.connect(self.btn_start_clicked)

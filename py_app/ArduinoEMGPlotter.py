@@ -135,7 +135,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         """
         Only initializes the plotHandler object. It is set as a method to allow override.
         """
-        self.plotHandler = EMGPlotHandler(qnt_points=4096, parent=parent, y_range=(-2.5, 2.5),
+        self.plotHandler = EMGPlotHandler(qnt_points=2000, parent=parent, y_range=(-2.5, 2.5),
                                           app=app, proc=None)
         self.plotHandler.process_in_plotter = False
         self.plotHandler.proc = 'hbt+btr'
@@ -168,7 +168,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
             if self.arduinoHandler.data_waiting:
                 #print("help! i need")
                 buf_data = self.arduinoHandler.buffer_acquisition.get()
-                self.emg_value = buf_data[0] * 5.0 / 4096.0 - 2.5
+                self.emg_value = buf_data[0] * 5.0 / 65536.0 - 2.5
 
                 if buf_data[1] == 1:  # Add points to vetor antes do estimulo
                     self.sinal_antes_do_estimulo.append(self.emg_value)
@@ -226,7 +226,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         else:
             if self.arduinoHandler.data_waiting:
                 buf_data = self.arduinoHandler.buffer_acquisition.get()
-                self.emg_value = buf_data[0] * 5.0 / 4096.0 - 2.5
+                self.emg_value = buf_data[0] * (5.0 / 65536.0) - 2.5
 
                 if buf_data[1] == 1:  # Add points to vetor antes do estimulo
                     self.sinal_antes_do_estimulo.append(self.emg_value)
@@ -234,18 +234,22 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
                     self.sinal_durante_estimulo.append(self.emg_value)
                     if len(self.sinal_antes_do_estimulo) >= 100:  # 500ms
                         self.sinais_antes_do_estimulo.append(
-                            self.sinal_antes_do_estimulo.copy())
+                            self.sinal_antes_do_estimulo)
                         if len(self.sinais_antes_do_estimulo) > 10:
                             self.sinais_antes_do_estimulo.pop(0)
                         self.sinal_antes_do_estimulo = []
                 elif buf_data[1] == 0:  # Reseta vetor com estimulo
                     if len(self.sinal_durante_estimulo) >= 100:  # 500ms
                         self.sinais_com_estimulo.append(
-                            self.sinal_durante_estimulo.copy())
+                            self.sinal_durante_estimulo)
                         if len(self.sinais_com_estimulo) > 10:
                             self.sinais_com_estimulo.pop(0)
+                            self.update_matplotlib_chart()
                         self.sinal_durante_estimulo = []
                 self.plotHandler.emg_bruto.buffer.put(self.emg_value)
+
+    def update_matplotlib_chart(self):
+        pass
 
 
 def test():
