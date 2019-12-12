@@ -11,6 +11,8 @@
 # Description:
 # ------------------------------------------------------------------------------
 from ArduinoEMGPlotter import ArduinoEMGPlotter
+import numpy as np
+import scipy as sp
 
 import sys
 if sys.version_info.major == 3:
@@ -30,6 +32,11 @@ elif sys.version_info.major == 2:
 else:
     print("Versao do python nao suportada")
 # ------------------------------------------------------------------------------
+import matplotlib.pyplot as plt  # Showing images
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
+# ------------------------------------------------------------------------------
+from matplotlib.figure import Figure
 
 
 class SetupApp(QMainWindow, config_window.Ui_windowConfig):
@@ -77,6 +84,26 @@ class ContractionDetector(QMainWindow, base.Ui_MainWindow):
         self.sl_threshould.setValue(0.25)
         self.sl_threshould_value_changed(10)
         self.proc_changed("Desativado")
+
+        self.edited_image_fig = Figure(figsize=(0.1, 0.1))
+        self.edited_image_canvas = FigureCanvas(self.edited_image_fig)
+        self.edited_image_toolbar = NavigationToolbar(
+            self.edited_image_canvas, self, coordinates=True)
+
+        self.edited_image_canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.edited_image_canvas.updateGeometry()
+        self.verticalLayoutGraph.addWidget(self.edited_image_canvas)
+        self.edited_image_canvas.draw()
+        self.verticalLayoutGraph.addWidget(self.edited_image_toolbar)
+
+        time_example = np.linspace(0, 1, 100)
+        y_example = np.sin(2 * np.pi * 3 * time_example)
+        gca_example = self.edited_image_fig.gca()
+        gca_example.plot(time_example, y_example)
+        gca_example.set_title("MMN")
+        gca_example.grid()
+        gca_example.set_xlabel('Index')
+        gca_example.set_ylabel('Media do sinal')
 
     def setup_signals_connections(self):
         #self.actionProcessamento.triggered.connect(self.processamento_clicked)
