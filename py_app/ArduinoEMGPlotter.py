@@ -140,7 +140,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         """
         Only initializes the plotHandler object. It is set as a method to allow override.
         """
-        self.plotHandler = EMGPlotHandler(qnt_points=2000, parent=parent, y_range=(-2.5, 2.5),
+        self.plotHandler = EMGPlotHandler(qnt_points=5000, parent=parent, y_range=(-2.5, 2.5),
                                           app=app, proc=None)
         self.plotHandler.process_in_plotter = False
         self.plotHandler.proc = 'hbt+btr'
@@ -231,7 +231,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         else:
             if self.arduinoHandler.data_waiting:
                 buf_data = self.arduinoHandler.buffer_acquisition.get()
-                self.emg_value = buf_data[0] * (5.0 / 65536.0) - 2.5
+                self.emg_value = buf_data[0] * (5.0 / 65536.0)
 
                 if buf_data[1] == 1:  # Add points to vetor antes do estimulo
                     self.sinal_antes_do_estimulo.append(self.emg_value)
