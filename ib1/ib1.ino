@@ -231,7 +231,7 @@ uint16_t read_adc() {
   //digitalWrite(ADC_CS_PINO, LOW);
   adc_reading_msb = SPI.transfer(0);
   adc_reading_lsb = SPI.transfer(0);
-  idle_reading = SPI.transfer(0);
+  uint8_t idle_reading = SPI.transfer(0);
   digitalWrite(ADC_CS_PINO, HIGH);
   SPI.endTransaction();
 
