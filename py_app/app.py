@@ -37,6 +37,7 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 # ------------------------------------------------------------------------------
 from matplotlib.figure import Figure
+import matplotlib.animation as animation
 
 
 class SetupApp(QMainWindow, config_window.Ui_windowConfig):
@@ -74,7 +75,30 @@ class ContractionDetector(QMainWindow, base.Ui_MainWindow):
         self.setupUi(self)
         self.setup_signals_connections()
 
-        self.emg_app = ArduinoEMGPlotter(parent=self.centralwidget,label=self.lbl_status)
+        self.edited_image_fig = Figure(figsize=(0.1, 0.1))
+        self.edited_image_canvas = FigureCanvas(self.edited_image_fig)
+        self.edited_image_toolbar = NavigationToolbar(
+            self.edited_image_canvas, self, coordinates=True)
+
+        time_example = np.linspace(0, 1, 100)
+        y_example = np.sin(2 * np.pi * 3 * time_example)
+        gca_example = self.edited_image_fig.gca()
+        # gca_example.hold(False)
+        # gca_example.plot([0]*100)
+        self.line, = gca_example.plot(y_example)
+        # gca_example.hold(False)
+        gca_example.set_title("MMN")
+        gca_example.grid(True)
+        gca_example.set_xlabel('Index')
+        gca_example.set_ylabel('MMN')
+
+        self.emg_app = ArduinoEMGPlotter(
+            parent=self.centralwidget,
+            label=self.lbl_status,
+            edited_image_fig=self.edited_image_fig,
+            line=self.line,
+            canvas=self.edited_image_canvas,
+        )
         self.verticalLayoutGraph.addWidget(self.emg_app.plotHandler.plotWidget)
 
         self.verticalLayoutGraph.removeWidget(self.label_replace)
@@ -85,32 +109,34 @@ class ContractionDetector(QMainWindow, base.Ui_MainWindow):
         self.sl_threshould_value_changed(10)
         self.proc_changed("Desativado")
 
-        self.edited_image_fig = Figure(figsize=(0.1, 0.1))
-        self.edited_image_canvas = FigureCanvas(self.edited_image_fig)
-        self.edited_image_toolbar = NavigationToolbar(
-            self.edited_image_canvas, self, coordinates=True)
-
         self.edited_image_canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.edited_image_canvas.updateGeometry()
         self.verticalLayoutGraph.addWidget(self.edited_image_canvas)
         self.edited_image_canvas.draw()
         self.verticalLayoutGraph.addWidget(self.edited_image_toolbar)
 
-        time_example = np.linspace(0, 1, 100)
-        y_example = np.sin(2 * np.pi * 3 * time_example)
-        gca_example = self.edited_image_fig.gca()
-        gca_example.plot(time_example, y_example)
-        gca_example.set_title("MMN")
-        gca_example.grid()
-        gca_example.set_xlabel('Index')
-        gca_example.set_ylabel('Media do sinal')
+
+        # call the animator
+        # self.anim = animation.FuncAnimation(
+        #     self.edited_image_fig, self.animate,
+        #     frames=500, interval=1000, blit=True
+        # )
+
+
+    # def animate(self, i):
+    #     self.line.set_data(
+    #         np.arange(0, len(self.emg_app.resultado)),
+    #         self.emg_app.resultado
+    #     )
+    #     return self.line,
+
 
     def update_matplotlib_chart(self, y_data=None):
         if y_data is None:
             time_example = np.linspace(0, 1, 100)
             y_data = np.sin(2 * np.pi * 3 * time_example)
         gca_example = self.edited_image_fig.gca()
-        gca_example.plot(y_data)
+        gca_example.lines.append(gca_example.plot(y_data))
         gca_example.set_title("MMN")
         gca_example.grid()
         gca_example.set_xlabel('Index')
