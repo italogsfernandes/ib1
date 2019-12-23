@@ -231,7 +231,8 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         else:
             if self.arduinoHandler.data_waiting:
                 buf_data = self.arduinoHandler.buffer_acquisition.get()
-                self.emg_value = buf_data[0] * (5.0 / 65536.0)
+                self.emg_value = buf_data[0] * (5.0 / 65536.0) - 2.5
+                print(self.emg_value)
 
                 if buf_data[1] == 1:  # Add points to vetor antes do estimulo
                     self.sinal_antes_do_estimulo.append(self.emg_value)

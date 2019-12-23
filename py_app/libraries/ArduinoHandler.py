@@ -13,6 +13,7 @@
 import serial
 import serial.tools.list_ports as serial_tools
 from ctypes import c_short
+from ctypes import c_long
 from .ThreadHandler import ThreadHandler, InfiniteTimer
 import sys
 if sys.version_info.major == 2:
@@ -153,7 +154,7 @@ class ArduinoHandler:
         :param lsb_byte: The less significant byte.
         :return: The word created by the two bytes.
         """
-        return c_short((msb_byte << 8) + lsb_byte).value
+        return c_long((msb_byte << 8) + lsb_byte).value
 
     def acquire_routine(self):
         """

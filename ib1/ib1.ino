@@ -25,8 +25,8 @@
 //Uncomment the next line to activate the sending of data as text
 //This is usefull when you are using the serial plotter tool (Ctrl+shift+L)
 
-#define ADC_ACQUIRER
-//#define AVR_ACQUIRER
+//#define ADC_ACQUIRER
+#define AVR_ACQUIRER
 //#define SIMULATOR
 //#define PLOTTER_SERIAL
 
@@ -108,8 +108,8 @@ unsigned long time_now, alarm_time;
 #define ADC_BUSY_PINO 9
 
 //#define ADC_CONVERSION_REGISTER 0x84 //0b 1000 0100
-#define ADC_CONVERSION_REGISTER 0xD6 //0b 1101 0110 (CH3 - Internal clock)
-//#define ADC_CONVERSION_REGISTER 0x86 //0b 1000 0110 (CH0 - Internal clock)
+//#define ADC_CONVERSION_REGISTER 0xD6 //0b 1101 0110 (CH3 - Internal clock)
+#define ADC_CONVERSION_REGISTER 0x86 //0b 1000 0110 (CH0 - Internal clock)
 
 SPISettings adc_spi_settings(8000000, MSBFIRST, SPI_MODE0);
 
@@ -153,7 +153,7 @@ void loop() {
     alarm_time = time_now + 500; // proximo alarme daqui a 500ms
 
     // seleciona estimulo
-    randNumber = random(5);
+    randNumber = random(10);
     freq_next = (randNumber == 0) ? FREQ_ODD : FREQ_BASE; // random
     freq_next = (freq_now == FREQ_ODD) ? FREQ_BASE : freq_next; // dont repeat
 
